@@ -1,0 +1,26 @@
+.loginDiv,
+.registerDiv {
+    animation: transform 1.5s ease-in;
+}
+
+.filterDiv details {
+    background-color: rgb(226, 232, 240);
+    padding: 4px;
+    border-radius: 4px;
+}
+
+@media only screen and (max-width:676px) {
+    .filterDiv {
+        margin-top: 20px;
+    }
+}
+
+@keyframes transform {
+    from {
+        transform: translateY(-450px);
+    }
+
+    to {
+        transform: translateY(0px);
+    }
+}
