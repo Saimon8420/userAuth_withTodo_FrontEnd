@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useRegisterMutation, useUpdateMutation } from '../Features/auth/authApi';
 import { toast } from 'react-toastify';
 
@@ -58,7 +58,9 @@ const Registration = () => {
     }, [pathName, userData])
 
     const [update, { data: userUpdatedData }] = useUpdateMutation();
-    const [register, { data: registerData }] = useRegisterMutation();
+    const [register, { data: registerData, isSuccess, isError }] = useRegisterMutation();
+
+    const navigate = useNavigate();
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -93,14 +95,28 @@ const Registration = () => {
         // For register user
         else {
             if (password === confirmPass) {
-                register({
-                    firstName: firstName,
-                    lastName: lastName,
-                    email: email,
-                    address: address,
-                    phone: phone,
-                    password: password,
-                })
+                if (firstName.length >= 4)
+                    register({
+                        firstName: firstName,
+                        lastName: lastName,
+                        email: email,
+                        address: address,
+                        phone: phone,
+                        password: password,
+                    })
+                else {
+                    toast.error(`FirstName length must be 5 character or more`, {
+                        position: "top-right",
+                        autoClose: 3000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "light",
+                        toastId: "register2",
+                    });
+                }
             }
             else {
                 console.log("password does not matched");
@@ -137,6 +153,9 @@ const Registration = () => {
                 theme: "light",
                 toastId: "register1",
             });
+            if (isSuccess) {
+                navigate("/login");
+            }
         }
         if (registerData !== undefined && registerData?.status === 500) {
             toast.error(`${registerData?.msg}`, {
@@ -150,11 +169,30 @@ const Registration = () => {
                 theme: "light",
                 toastId: "register2",
             });
+            if (isError) {
+                navigate("/home");
+            }
         }
-    }, [userUpdatedData, registerData])
+    }, [userUpdatedData, registerData, navigate, isSuccess, isError])
 
     return (
         <div className='m-5 pb-5 registerDiv'>
+            <div className="sm:mx-auto sm:w-full sm:max-w-sm mb-5">
+                <div className="flex items-center justify-center gap-5 mt-0">
+                    <img
+                        className="h-10 w-auto"
+                        src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
+                        alt="Your Company"
+                    />
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="rgb(79, 70, 229)" viewBox="0 0 24 24" strokeWidth={1.5} stroke="rgb(250, 245, 256)" className="w-auto h-10 cursor-pointer" onClick={() => navigate("/home")}>
+                        <title>Go back to home</title>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                    </svg>
+                </div>
+                <h2 className="mt-3 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+                    Register your account
+                </h2>
+            </div>
             <form onSubmit={handleSubmit}>
                 <div className="space-y-12">
                     <div className="border-b border-gray-900/10 pb-12">
@@ -185,6 +223,9 @@ const Registration = () => {
                                         onChange={(e) => setFirstName(e.target.value)}
                                         required
                                     />
+                                    {
+                                        firstName.length <= 5 && <p className="mt-1 text-sm leading-6 text-gray-600 opacity-50">The total length must be at least 5 characters or more..</p>
+                                    }
                                 </div>
                             </div>
 
@@ -349,7 +390,7 @@ const Registration = () => {
                 pathName === "/register" &&
                 <p className="mt-10 text-center text-sm text-gray-500">
                     Have an account?{' '}
-                    <Link to={"/"} className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+                    <Link to={"/login"} className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
                         Please Sign-in
                     </Link>
                 </p>

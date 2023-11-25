@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Dialog } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { userLoggedOut } from '../Features/auth/authSlice';
 import { toast } from 'react-toastify';
@@ -14,7 +14,7 @@ const navigation = [
 export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const dispatch = useDispatch();
-
+    const navigate = useNavigate();
     const handleLogOut = () => {
         toast('User successfully logged out', {
             position: "top-right",
@@ -28,7 +28,11 @@ export default function Header() {
             toastId: "logout1",
         });
         dispatch(userLoggedOut());
+        setTimeout(() => {
+            navigate("/home");
+        }, 1200);
     }
+
     return (
         <div className="bg-white">
             <header className="fixed inset-x-0 top-0 z-50 bg-slate-200">

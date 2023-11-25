@@ -3,6 +3,19 @@
     animation: transform 1.5s ease-in;
 }
 
+.homeDiv {
+    background-image: url("../src/assets/animated_images/Business\ Tasklist.gif");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-clip: border-box;
+    background-size: 500px 300px;
+    background-position-y: top;
+}
+
+.features {
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+}
+
 .filterDiv details {
     background-color: rgb(226, 232, 240);
     padding: 4px;

@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import './App.css'
 import Registration from './components/UserCredential/Registration';
 import Login from './components/UserCredential/Login'
@@ -16,6 +16,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import AddTodo from './components/Todos/AddTodo';
 import UpdateTodo from './components/Todos/UpdateTodo';
 import Loading from './components/Loading/Loading';
+import Home from './components/Home/Home';
 
 function App() {
   const getToken = JSON.parse(localStorage.getItem("userAuth"));
@@ -66,7 +67,12 @@ function App() {
       <ToastContainer />
       {isLoading && <Loading />}
       <Routes>
-        <Route path="/login" element={<Login />}></Route>
+        {userData?.user === undefined && <Route path="/home" element={<Home />}></Route>
+        }
+        {
+          userData?.user === undefined &&
+          <Route path="/login" element={<Login />}></Route>
+        }
         {
           userData?.user === undefined && <Route path="/register" element={<Registration />}></Route>
         }
