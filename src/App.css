@@ -4,7 +4,7 @@
 }
 
 .homeDiv {
-    background-image: url("../public/animated_images/Business\ Tasklist.gif");
+    background-image: url("/src/assets/animated_images/Business_Tasklist.gif");
     background-position: center;
     background-repeat: no-repeat;
     background-clip: border-box;
