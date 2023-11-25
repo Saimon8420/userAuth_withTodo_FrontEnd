@@ -6,7 +6,7 @@ const ProtectedRoute = ({ children }) => {
     const token = getToken?.accessToken;
     const user = useSelector((state) => state?.auth);
     // console.log(user);
-    if (((token === null || token === undefined) && (user?.user === null || undefined))) {
+    if (((token === null || token === undefined) && (user?.user === null || user?.user === undefined))) {
         return <Navigate to="/home" replace />;
     }
     else {

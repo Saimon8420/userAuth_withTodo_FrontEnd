@@ -28,9 +28,6 @@ export default function Header() {
             toastId: "logout1",
         });
         dispatch(userLoggedOut());
-        setTimeout(() => {
-            navigate("/home");
-        }, 1200);
     }
 
     return (
