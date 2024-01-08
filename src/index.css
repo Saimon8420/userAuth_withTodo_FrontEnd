@@ -5,6 +5,11 @@
 body {
   font-family: Inter;
   text-align: center;
-  margin: 10px;
+  scroll-behavior: smooth;
+}
+
+* {
+  margin: 0px;
+  padding: 0px;
   scroll-behavior: smooth;
 }

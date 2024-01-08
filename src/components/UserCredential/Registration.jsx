@@ -57,8 +57,8 @@ const Registration = () => {
         }
     }, [pathName, userData])
 
-    const [update, { data: userUpdatedData }] = useUpdateMutation();
-    const [register, { data: registerData, isSuccess, isError }] = useRegisterMutation();
+    const [update, { data: userUpdatedData, isLoading: updateLoading }] = useUpdateMutation();
+    const [register, { data: registerData, isSuccess, isError, isLoading: registerLoading }] = useRegisterMutation();
 
     const navigate = useNavigate();
 
@@ -176,7 +176,7 @@ const Registration = () => {
     }, [userUpdatedData, registerData, navigate, isSuccess, isError])
 
     return (
-        <div className='m-5 pb-5 registerDiv'>
+        <div className='p-5 registerDiv'>
             <div className="sm:mx-auto sm:w-full sm:max-w-sm mb-5">
                 <div className="flex items-center justify-center gap-5 mt-0">
                     <img
@@ -184,14 +184,24 @@ const Registration = () => {
                         src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
                         alt="Your Company"
                     />
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="rgb(79, 70, 229)" viewBox="0 0 24 24" strokeWidth={1.5} stroke="rgb(250, 245, 256)" className="w-auto h-10 cursor-pointer" onClick={() => navigate("/home")}>
-                        <title>Go back to home</title>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                    </svg>
+                    {
+                        pathName !== "/updateUser" && <svg xmlns="http://www.w3.org/2000/svg" fill="rgb(79, 70, 229)" viewBox="0 0 24 24" className="w-auto h-10 cursor-pointer" onClick={() => navigate("/home")}>
+                            <title>Go back to home</title>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                        </svg>
+                    }
                 </div>
-                <h2 className="mt-3 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-                    Register your account
-                </h2>
+                {
+                    pathName !== "/updateUser" && <h2 className="mt-3 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+                        Register your account
+                    </h2>
+                }
+                {
+                    pathName === "/updateUser" && <h2 className="mt-3 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+                        Update User Info
+                    </h2>
+                }
+
             </div>
             <form onSubmit={handleSubmit}>
                 <div className="space-y-12">
@@ -379,6 +389,7 @@ const Registration = () => {
                         </div>
                     </div>
                     <button
+                        disabled={updateLoading || registerLoading}
                         type="submit"
                         className="flex w-1/4 justify-center items-center rounded-md mx-auto bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     >

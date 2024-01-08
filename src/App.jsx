@@ -63,7 +63,7 @@ function App() {
   }, [token, dispatch, expTime])
 
   return (
-    <div>
+    <div className='app'>
       <ToastContainer />
       {isLoading && <Loading />}
       <Routes>

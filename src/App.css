@@ -3,18 +3,23 @@
     animation: transform 1.5s ease-in;
 }
 
-.homeDiv {
-    background-image: url("/src/assets/animated_images/Business_Tasklist.gif");
-    background-position: center;
-    background-repeat: no-repeat;
-    background-clip: border-box;
-    background-size: 500px 300px;
-    background-position-y: top;
+.app {
+    margin: 10px;
+    /* min-height: 100vh;
+    width: 100%; */
 }
 
-.features {
-    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+.homeDiv {
+    background-image: url("/public/BG_Images/desktop_bg.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-height: calc(100vh - 20px);
 }
+
+/* .features {
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+} */
 
 .filterDiv details {
     background-color: rgb(226, 232, 240);
@@ -26,7 +31,13 @@
     .filterDiv {
         margin-top: 20px;
     }
+
+    .homeDiv {
+        background-image: url("/public/BG_Images/phone_bg.jpg");
+    }
 }
+
+@media only screen and (min-width:677px) and (max-width:978px) {}
 
 @keyframes transform {
     from {

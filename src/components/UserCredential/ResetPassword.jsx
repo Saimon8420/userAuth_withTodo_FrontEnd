@@ -17,7 +17,7 @@ const ResetPassword = () => {
 
     const navigate = useNavigate();
 
-    const [resetPassword, { data, isSuccess }] = useResetPasswordMutation();
+    const [resetPassword, { data, isSuccess, isLoading }] = useResetPasswordMutation();
 
     useEffect(() => {
         setPassVal(/^(?=.*\d)(?=.*[!@#$ %^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/.test(password));
@@ -138,7 +138,7 @@ const ResetPassword = () => {
                 <button
                     onClick={() => handleReset()}
                     className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                    disabled={password.length === 0 && !matchedPass}
+                    disabled={password.length === 0 && !matchedPass || isLoading}
                 >
                     Reset Password
                 </button>

@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 const SendResetEmail = () => {
     const [email, setEmail] = useState([]);
     const navigate = useNavigate();
-    const [sendResetEmail, { data, isSuccess }] = useSendResetEmailMutation();
+    const [sendResetEmail, { data, isSuccess, isLoading }] = useSendResetEmailMutation();
 
     useEffect(() => {
         if (isSuccess) {
@@ -69,7 +69,7 @@ const SendResetEmail = () => {
                 <button
                     onClick={() => sendResetEmail({ email: email })}
                     className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                    disabled={email?.length === 0}
+                    disabled={email?.length === 0 || isLoading}
                 >
                     Submit
                 </button>
