@@ -9,6 +9,10 @@
 * React Router Dom
 * React Toastify
 
+## Site View
+
+![Login](/public/site_view/login.PNG)
+
 ## Features
 An user authentication system, where user can register him/her, as a registered user he/she can login, after login he/she will get his/her profile and user can update his/her user info. As an extra feature he/she will get todo task features, where user can add,update,delete todo.
 
