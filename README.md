@@ -14,6 +14,30 @@
 * Login
 ![Login](/public/site_view/login.PNG)
 
+* Register
+![Register](/public/site_view/Register.PNG)
+
+* Reset Pass
+![ResetPass](/public/site_view/resetPass.PNG)
+
+* Home
+![Home](/public/site_view/home.PNG)
+
+* Update Profile
+![UpdateProfile](/public/site_view/UpdateProfile.PNG)
+
+* TodoView
+![Todo](/public/site_view/todoView.PNG)
+
+* TodoViewFilter
+![Todo1](/public/site_view/todoView1.PNG)
+
+* UpdateTodo
+![UpdateTodo](/public/site_view/updateTodo.PNG)
+
+* DeleteTodo
+![DeleteTodo](/public/site_view/deleteTodo.PNG)
+
 ## Features
 An user authentication system, where user can register him/her, as a registered user he/she can login, after login he/she will get his/her profile and user can update his/her user info. As an extra feature he/she will get todo task features, where user can add,update,delete todo.
 
