@@ -54,7 +54,7 @@ const AddTodo = () => {
     }, [data, navigate, isSuccess])
 
     return (
-        <div className='p-5'>
+        <div className='rounded-md shadow-md px-5 pt-2 pb-5'>
             {
                 isLoading && <Loading />
             }

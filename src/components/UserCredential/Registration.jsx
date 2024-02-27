@@ -176,7 +176,7 @@ const Registration = () => {
     }, [userUpdatedData, registerData, navigate, isSuccess, isError])
 
     return (
-        <div className='p-5 registerDiv'>
+        <div className='px-5 pt-2 pb-5 registerDiv rounded-md shadow-md'>
             <div className="sm:mx-auto sm:w-full sm:max-w-sm mb-5">
                 <div className="flex items-center justify-center gap-5 mt-0">
                     <img
@@ -208,8 +208,11 @@ const Registration = () => {
                     <div className="border-b border-gray-900/10 pb-12">
                         <h2 className="font-bold leading-7 text-gray-900 text-lg">{pathName === "/updateUser" && "Update "}Personal Information</h2>
                         {pathName === "/updateUser" &&
-                            <div className="mt-3 underline font-semibold text-sky-400">
-                                <Link to={"/"}>Back to profile</Link>
+                            <div className="mt-3 underline font-semibold text-indigo-600">
+                                <Link className='flex gap-1 items-center justify-center' to={"/"}>Back to <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                </svg>
+                                </Link>
                             </div>
                         }
                         {

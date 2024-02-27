@@ -14,13 +14,14 @@ const Todo = () => {
     const [allTodo, setAllTodo] = useState([]);
     const dispatch = useDispatch();
     const todo = useSelector((state) => state.todo);
+
     useEffect(() => {
         if (isSuccess) {
             refetch();
             dispatch(setTodo({ todo: data?.data }));
             setAllTodo(todo?.allTodo);
         }
-    }, [isSuccess, data, todo])
+    }, [isSuccess, data, todo, dispatch, refetch]);
 
     const navigate = useNavigate();
 
@@ -43,6 +44,7 @@ const Todo = () => {
                         </div>
                         {allTodo?.length === 0 ? <div className="mt-5">No todo found, please add some todo</div> : <>
                             <div className="mt-10 lg:flex lg:items-center lg:justify-between md:flex md:items-center md:justify-between sm:grid sm:grid-cols-1 sm:items-start sm:gap-5">
+                                {/* Search Todo */}
                                 <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 sm:mb-5">
                                     <div className="sm:col-span-4">
                                         <label htmlFor="search" className="block text-sm font-medium leading-6 text-gray-900 text-left">
@@ -64,6 +66,8 @@ const Todo = () => {
                                         </div>
                                     </div>
                                 </div>
+
+                                {/* Filter todo */}
                                 <div className="text-start filterDiv">
                                     <details className="hover:cursor-pointer">
                                         <summary>Filter Option</summary>

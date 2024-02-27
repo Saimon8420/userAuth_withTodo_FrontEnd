@@ -5,8 +5,29 @@ import { toast } from 'react-toastify';
 
 const ResetPassword = () => {
     const token = useParams();
+    let check = false;
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const check = /^[a-zA-Z0-9]+$/.test(token?.token);
+        if (check) {
+            toast.error("Invalid url", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                toastId: "resetPass4",
+            });
+            navigate("/");
+        }
+    }, [check, token, navigate]);
+
     // converting btoa token into readable and convertible machine token
-    const decodedToken = atob(token?.token);
+    const decodedToken = !check && atob(token?.token);
     const [password, setPassword] = useState([]);
     const [confirmPass, setConfirmPass] = useState([]);
     const [matchedPass, setMatchedPass] = useState(false);
@@ -14,8 +35,6 @@ const ResetPassword = () => {
     // Show Password
     const [showPass, setShowPass] = useState(false);
     const [showConPass, setShowConPass] = useState(false);
-
-    const navigate = useNavigate();
 
     const [resetPassword, { data, isSuccess, isLoading }] = useResetPasswordMutation();
 
@@ -47,7 +66,7 @@ const ResetPassword = () => {
                     theme: "light",
                     toastId: "resetPass1",
                 });
-                navigate("/");
+                navigate("/home");
             }
             if (data !== undefined && data?.status === 401) {
                 toast.error(`${data?.msg}`, {
@@ -62,12 +81,12 @@ const ResetPassword = () => {
                     toastId: "resetPass2",
                 });
             }
-            navigate("/");
+            navigate("/home");
         }
-    }, [isSuccess])
+    }, [isSuccess, navigate, data])
 
     return (
-        <div className='mt-10 mx-auto lg:w-1/2 md:w-1/2'>
+        <div className='resetPassword mt-10 mx-auto lg:w-1/2 md:w-1/2'>
             <h3 className='font-bold text-lg mt-5 mb-5'>Reset Password</h3>
             {/* Password */}
             <div className="sm:col-span-3">

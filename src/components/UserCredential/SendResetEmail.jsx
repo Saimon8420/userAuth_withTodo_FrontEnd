@@ -39,10 +39,10 @@ const SendResetEmail = () => {
                 navigate("/register");
             }
         }
-    }, [isSuccess])
+    }, [isSuccess, data, navigate])
 
     return (
-        <div className="mt-20 mx-6">
+        <div className="sendResetEmail mt-20 mx-6">
             <p className="mb-5 text-center font-bold">Enter your registered user email address,<br />to reset your password</p>
             <div className="relative mt-2 rounded-md shadow-sm lg:w-1/2 md:w-1/2 sm:w-full m-auto">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">

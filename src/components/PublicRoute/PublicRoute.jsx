@@ -1,14 +1,14 @@
 import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 
-const ProtectedRoute = ({ children }) => {
+const PublicRoute = ({ children }) => {
     const user = useSelector((state) => state?.auth);
-    if (user?.user === undefined) {
-        return <Navigate to="/home" replace />;
+    if (user?.user !== undefined) {
+        return <Navigate to="/" replace />;
     }
     else {
         return children;
     }
 };
 
-export default ProtectedRoute;
+export default PublicRoute;

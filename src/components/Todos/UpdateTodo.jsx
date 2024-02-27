@@ -57,10 +57,10 @@ const UpdateTodo = () => {
     }, [updateData, navigate, isSuccess])
 
     return (
-        <div className='p-5'>
+        <div className='px-5 pt-2 pb-5 rounded-md shadow-md'>
             {isLoading ? <Loading /> :
                 <form onSubmit={handleUpdateTodo}>
-                    <div className="space-y-12 mt-5">
+                    <div className="space-y-12 mt-5 ">
                         <div className="border-b border-gray-900/10 pb-12">
                             <h2 className="text-base font-semibold leading-7 text-gray-900">
                                 Update Todo
