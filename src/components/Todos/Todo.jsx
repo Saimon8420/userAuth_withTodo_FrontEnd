@@ -60,7 +60,7 @@ const Todo = () => {
                                                     type="text"
                                                     className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
                                                     placeholder="Search todo"
-                                                    onChange={(e) => setSearch(e.target.value)}
+                                                    onChange={(e) => setSearch(e.target.value.toLowerCase())}
                                                 />
                                             </div>
                                         </div>
@@ -100,7 +100,7 @@ const Todo = () => {
                                 {
 
                                     allTodo
-                                        ?.filter((each) => each?.title?.includes(search) || each?.description?.includes(search))
+                                        ?.filter((each) => each?.title?.toLowerCase().includes(search) || each?.description?.toLowerCase().includes(search))
                                         ?.filter((each) => each?.status?.includes(filterOpt))
                                         ?.map((filteredTodo) => (
                                             <TodoList key={filteredTodo?._id} todo={filteredTodo} />
