@@ -3,6 +3,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useGetEachTodoQuery, useUpdateTodoMutation } from '../Features/todo/todoApi';
 import Loading from '../Loading/Loading';
 import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { userLoggedOut } from '../Features/auth/authSlice';
+import { useLazyLogoutUserQuery } from '../Features/auth/authApi';
+import { setTodoRefetch } from '../Features/todo/todoSlice';
 
 const UpdateTodo = () => {
     const [title, setTitle] = useState([]);
@@ -11,10 +15,24 @@ const UpdateTodo = () => {
     const [selected, setSelected] = useState([]);
     const todoId = useParams();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const [validation, setInputValidation] = useState(false);
+
+    useEffect(() => {
+        if ((title?.length > 5 && title?.length < 50) && (details?.length > 10 && details?.length < 150)) {
+            setInputValidation(true);
+        }
+        else {
+            setInputValidation(false);
+        }
+    }, [title, details])
 
     const { data, isLoading, isSuccess: getSuccess, refetch } = useGetEachTodoQuery(todoId?.id, {
         refetchOnMountOrArgChange: true,
     });
+
+    const [logoutUser] = useLazyLogoutUserQuery();
+
     useEffect(() => {
         if (getSuccess) {
             refetch();
@@ -23,7 +41,22 @@ const UpdateTodo = () => {
             setStatus(data?.data?.status);
             setSelected(data?.data?.status);
         }
-    }, [data, getSuccess])
+        if (data?.status === 401) {
+            toast.error(`${data?.msg}`, {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                toastId: "updateTodo22",
+            });
+            dispatch(userLoggedOut());
+            logoutUser();
+        }
+    }, [data, getSuccess, refetch, dispatch, logoutUser])
 
     const [updateTodo, { data: updateData, isSuccess, isLoading: updateLoading }] = useUpdateTodoMutation();
 
@@ -50,11 +83,25 @@ const UpdateTodo = () => {
                 toastId: "updateTodo1",
                 //toast id dile toast ekbar ee show korbe***
             });
-            if (isSuccess) {
-                return navigate("/todo");
-            }
+            dispatch(setTodoRefetch());
+            return navigate("/todo");
         }
-    }, [updateData, navigate, isSuccess])
+        if (updateData?.status === 401 && updateData?.msg) {
+            toast.error(`${updateData?.msg}`, {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                toastId: "updateTodo22",
+            });
+            dispatch(userLoggedOut());
+            logoutUser();
+        }
+    }, [updateData, navigate, isSuccess, dispatch, logoutUser])
 
     return (
         <div className='px-5 pt-2 pb-5 rounded-md shadow-md'>
@@ -90,6 +137,7 @@ const UpdateTodo = () => {
                                             />
                                         </div>
                                     </div>
+                                    <span className='text-xs font-bold opacity-30'>{title?.length === 0 && "Title length: min-5 & max-50 "}</span>
                                 </div>
 
                                 <div className="sm:col-span-3">
@@ -125,20 +173,23 @@ const UpdateTodo = () => {
                                             placeholder='Add updated todo details'
                                         />
                                     </div>
+                                    <span className='text-xs font-bold opacity-30'>{details?.length === 0 && "Details length: min-10 & max-150 "}</span>
                                     <p className="mt-3 text-sm leading-6 text-gray-600 font-bold">Write todo details.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    {/* buttons */}
                     <div className="mt-6 flex items-center justify-end gap-x-6">
                         <button onClick={() => navigate("/todo")} type="button" className="text-sm font-semibold leading-6 text-gray-900">
                             Cancel
                         </button>
+
                         <button
-                            disabled={updateLoading}
+                            disabled={updateLoading || (title.length === 0 && details.length === 0)}
                             type="submit"
-                            className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                            className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${!validation ? 'bg-red-600' : 'bg-indigo-600 hover:bg-indigo-500'}`}
                         >
                             Save
                         </button>

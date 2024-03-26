@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { useRegisterMutation, useUpdateMutation } from '../Features/auth/authApi';
 import { toast } from 'react-toastify';
+import { updateUser, userLoggedOut } from '../Features/auth/authSlice';
 
 const Registration = () => {
     const [firstName, setFirstName] = useState([]);
@@ -57,7 +58,7 @@ const Registration = () => {
         }
     }, [pathName, userData])
 
-    const [update, { data: userUpdatedData, isLoading: updateLoading }] = useUpdateMutation();
+    const [update, { data: userUpdatedData, isLoading: updateLoading, isSuccess: updateSuccess }] = useUpdateMutation();
     const [register, { data: registerData, isSuccess, isError, isLoading: registerLoading }] = useRegisterMutation();
 
     const navigate = useNavigate();
@@ -124,9 +125,11 @@ const Registration = () => {
         }
     }
 
+    const dispatch = useDispatch();
+
     // for toast
     useEffect(() => {
-        // user update toast
+        // user update & toast
         if (userUpdatedData !== undefined && userUpdatedData?.status === 200) {
             toast(`${userUpdatedData?.msg}`, {
                 position: "top-right",
@@ -139,8 +142,29 @@ const Registration = () => {
                 theme: "light",
                 toastId: "update1",
             });
+
+            if (updateSuccess) {
+                dispatch(updateUser({
+                    user: userUpdatedData?.userData,
+                }))
+                navigate("/");
+            }
         }
-        // user register toast
+        if (userUpdatedData?.status === 401) {
+            toast.error(`${userUpdatedData?.msg}`, {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                toastId: "update2",
+            });
+            dispatch(userLoggedOut());
+        }
+        // user register & toast
         if (registerData !== undefined && registerData?.status === 201) {
             toast(`${registerData?.msg}`, {
                 position: "top-right",
@@ -173,7 +197,7 @@ const Registration = () => {
                 navigate("/home");
             }
         }
-    }, [userUpdatedData, registerData, navigate, isSuccess, isError])
+    }, [userUpdatedData, registerData, navigate, isSuccess, isError, dispatch, updateSuccess])
 
     return (
         <div className='px-5 pt-2 pb-5 registerDiv rounded-md shadow-md'>
@@ -237,7 +261,7 @@ const Registration = () => {
                                         required
                                     />
                                     {
-                                        firstName.length <= 5 && <p className="mt-1 text-sm leading-6 text-gray-600 opacity-50">The total length must be at least 5 characters or more..</p>
+                                        firstName?.length <= 5 && <p className="mt-1 text-sm leading-6 text-gray-600 opacity-50">The total length must be at least 5 characters or more..</p>
                                     }
                                 </div>
                             </div>
@@ -277,7 +301,7 @@ const Registration = () => {
                                     />
                                 </div>
                                 {
-                                    (email.length > 0 && !emailVal) && < label className='block text-sm font-medium leading-6 text-red-500'>Invalid Email</label>
+                                    (email?.length > 0 && !emailVal) && < label className='block text-sm font-medium leading-6 text-red-500'>Invalid Email</label>
                                 }
 
                             </div>
@@ -300,10 +324,10 @@ const Registration = () => {
                                     />
                                 </div>
                                 {
-                                    (phone.length > 0 && !phoneVal) && <label className='block text-sm font-medium leading-6 text-red-500'>Invalid Number</label>
+                                    (phone?.length > 0 && !phoneVal) && <label className='block text-sm font-medium leading-6 text-red-500'>Invalid Number</label>
                                 }
                                 {
-                                    phone.length === 0 && <p className="mt-1 text-sm leading-6 text-gray-600 opacity-50">Can use +88, or any 11digits valid BD number.</p>
+                                    phone?.length === 0 && <p className="mt-1 text-sm leading-6 text-gray-600 opacity-50">Can use +88, or any 11digits valid BD number.</p>
                                 }
 
                             </div>
@@ -353,10 +377,10 @@ const Registration = () => {
                                     }
                                 </div>
                                 {
-                                    (password.length > 0 && !passVal) && <label className='block text-sm font-medium leading-6 text-red-500'>Invalid Password</label>
+                                    (password?.length > 0 && !passVal) && <label className='block text-sm font-medium leading-6 text-red-500'>Invalid Password</label>
                                 }
                                 {
-                                    password.length === 0 && <p className="mt-1 text-sm leading-6 text-gray-600 opacity-50">Should contains each of [0-9], [!@#$%^&*], [A-Z], [a-z].The total length should be at least 8 characters..</p>
+                                    password?.length === 0 && <p className="mt-1 text-sm leading-6 text-gray-600 opacity-50">Should contains each of [0-9], [!@#$%^&*], [A-Z], [a-z].The total length should be at least 8 characters..</p>
                                 }
                             </div>
 
@@ -386,7 +410,7 @@ const Registration = () => {
                                     }
                                 </div>
                                 {
-                                    (confirmPass.length > 0 && !matchedPass) && <label className='block text-sm font-medium leading-6 text-red-500'>Password does not matched</label>
+                                    (confirmPass?.length > 0 && !matchedPass) && <label className='block text-sm font-medium leading-6 text-red-500'>Password does not matched</label>
                                 }
                             </div>
                         </div>

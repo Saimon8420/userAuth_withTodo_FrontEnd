@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "../Features/auth/authApi";
-import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import Loading from "../Loading/Loading";
+import { userLoggedIn } from "../Features/auth/authSlice";
 
 const Login = () => {
     const [email, setEmail] = useState([]);
@@ -14,29 +15,31 @@ const Login = () => {
     const navigate = useNavigate();
     const [login, { data, isLoading }] = useLoginMutation();
 
-    const userData = useSelector((state) => state.auth)
+    const dispatch = useDispatch();
 
     const handleLogin = async (e) => {
         e.preventDefault();
         login({ email, password });
     }
+
     useEffect(() => {
-        if (data !== undefined && data?.accessToken && data?.userData || userData?.user !== undefined) {
-            if (data !== undefined && data?.accessToken && data?.userData) {
-                toast('User successfully logged in', {
-                    position: "top-right",
-                    autoClose: 3000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "light",
-                    toastId: "login1",
-                    //toast id dile toast ekbar ee show korbe***
-                });
-                return navigate("/");
+        if (data !== undefined && data?.userData && !isLoading) {
+            const setData = async () => {
+                dispatch(userLoggedIn({ user: await data?.userData }));
             }
+            setData();
+            toast('User successfully logged in', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                toastId: "login1",
+                //toast id dile toast ekbar ee show korbe***
+            });
         }
         if (data !== undefined && data?.status === 500 && data?.msg) {
             toast.error(`${data?.msg}`, {
@@ -52,7 +55,7 @@ const Login = () => {
                 //toast id dile toast ekbar ee show korbe***
             });
         }
-    }, [data, navigate, userData]);
+    }, [data, navigate, dispatch, isLoading]);
 
     return (
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 loginDiv">

@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Dialog } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { userLoggedOut } from '../Features/auth/authSlice';
 import { toast } from 'react-toastify';
+import { useLazyLogoutUserQuery } from '../Features/auth/authApi';
 
 const navigation = [
     { name: 'Todos', href: '/todo' },
@@ -13,22 +14,31 @@ const navigation = [
 
 export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [logOut, setLogout] = useState(false);
     const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const handleLogOut = () => {
-        toast('User successfully logged out', {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-            toastId: "logout1",
-        });
-        dispatch(userLoggedOut());
-    }
+
+    const [logoutUser, { isLoading, error }] = useLazyLogoutUserQuery();
+
+    useEffect(() => {
+        if (logOut) {
+            const handleLogOut = () => {
+                toast('User successfully logged out', {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    toastId: "logout1",
+                });
+                dispatch(userLoggedOut());
+                logoutUser();
+            }
+            handleLogOut();
+        }
+    }, [logOut, dispatch, logoutUser])
 
     return (
         <div className="bg-white">
@@ -71,7 +81,7 @@ export default function Header() {
                         ))}
                     </div>
                     <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-                        <a onClick={() => handleLogOut()} className="text-sm font-semibold leading-6 text-gray-900 cursor-pointer">
+                        <a onClick={() => setLogout(true)} className="text-sm font-semibold leading-6 text-gray-900 cursor-pointer">
                             Log Out <span aria-hidden="true">&rarr;</span>
                         </a>
                     </div>
@@ -118,7 +128,7 @@ export default function Header() {
                                 <div className="py-6">
                                     <a
                                         className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50 cursor-pointer"
-                                        onClick={() => handleLogOut()}
+                                        onClick={() => setLogout(true)}
                                     >
                                         Log Out &rarr;
                                     </a>

@@ -3,14 +3,31 @@ import { useNavigate } from 'react-router-dom';
 import { useAddTodoMutation } from '../Features/todo/todoApi';
 import Loading from '../Loading/Loading';
 import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { useLazyLogoutUserQuery } from '../Features/auth/authApi';
+import { userLoggedOut } from '../Features/auth/authSlice';
+import { setTodoRefetch } from '../Features/todo/todoSlice';
 
 const AddTodo = () => {
     const [title, setTitle] = useState([]);
     const [details, setDetails] = useState([]);
 
+    const [validation, setInputValidation] = useState(false);
+    const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const [logoutUser] = useLazyLogoutUserQuery();
+
     const [addTodo, { data, isLoading, isSuccess }] = useAddTodoMutation();
+
+    useEffect(() => {
+        if ((title?.length > 5 && title?.length < 50) && (details?.length > 10 && details?.length < 150)) {
+            setInputValidation(true);
+        }
+        else {
+            setInputValidation(false);
+        }
+    }, [title, details])
 
     const handleAddTodo = (e) => {
         e.preventDefault();
@@ -34,6 +51,7 @@ const AddTodo = () => {
                 //toast id dile toast ekbar ee show korbe***
             });
             if (isSuccess) {
+                dispatch(setTodoRefetch());
                 return navigate("/todo");
             }
         }
@@ -50,8 +68,10 @@ const AddTodo = () => {
                 theme: "light",
                 toastId: "addTodo2",
             });
+            dispatch(userLoggedOut());
+            logoutUser();
         }
-    }, [data, navigate, isSuccess])
+    }, [data, navigate, isSuccess, dispatch, logoutUser])
 
     return (
         <div className='rounded-md shadow-md px-5 pt-2 pb-5'>
@@ -89,6 +109,7 @@ const AddTodo = () => {
                                         />
                                     </div>
                                 </div>
+                                <span className='text-xs font-bold opacity-30'>{title?.length === 0 && "Title length: min-5 & max-50 "}</span>
                             </div>
 
                             <div className="col-span-full">
@@ -106,6 +127,7 @@ const AddTodo = () => {
                                         placeholder='Add todo details'
                                     />
                                 </div>
+                                <span className='text-xs font-bold opacity-30'>{details?.length === 0 && "Details length: min-10 & max-150 "}</span>
                                 <p className="mt-3 text-sm leading-6 text-gray-600 font-bold">Write todo details.</p>
                             </div>
                         </div>
@@ -116,10 +138,11 @@ const AddTodo = () => {
                     <button onClick={() => navigate("/todo")} type="button" className="text-sm font-semibold leading-6 text-gray-900">
                         Cancel
                     </button>
+
                     <button
                         disabled={isLoading || (title.length === 0 && details.length === 0)}
                         type="submit"
-                        className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                        className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${!validation ? 'bg-red-600' : 'bg-indigo-600 hover:bg-indigo-500'}`}
                     >
                         Save
                     </button>

@@ -6,13 +6,13 @@ import NotFound from './components/NotFound/NotFound';
 import Profile from './components/Profile/Profile';
 import Todo from './components/Todos/Todo';
 import { useEffect } from 'react';
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useGetUserInfoQuery } from './components/Features/auth/authApi';
-import { setUser } from './components/Features/auth/authSlice';
+import { setUser, userLoggedOut } from './components/Features/auth/authSlice';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import SendResetEmail from './components/UserCredential/SendResetEmail';
 import ResetPassword from './components/UserCredential/ResetPassword';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import AddTodo from './components/Todos/AddTodo';
 import UpdateTodo from './components/Todos/UpdateTodo';
 import Loading from './components/Loading/Loading';
@@ -20,19 +20,32 @@ import Home from './components/Home/Home';
 import PublicRoute from './components/PublicRoute/PublicRoute';
 
 function App() {
-  const userData = useSelector(state => state?.auth);
+  const { isLoading, data, refetch, isSuccess } = useGetUserInfoQuery();
   const dispatch = useDispatch();
-  const { data, isLoading, isSuccess, refetch } = useGetUserInfoQuery({ refetchOnMountOrArgChange: true, });
 
   useEffect(() => {
-    const getToken = JSON.parse(localStorage.getItem("userAuth"));
-    const token = getToken?.accessToken;
-    if (token && userData?.accessToken === undefined && userData?.user === undefined) {
+    refetch();
+    if (data?.status === 401 && data?.msg && isSuccess) {
+      dispatch(userLoggedOut());
+      // toast.error(`${data?.msg}`, {
+      //   position: "top-right",
+      //   autoClose: 3000,
+      //   hideProgressBar: false,
+      //   closeOnClick: true,
+      //   pauseOnHover: true,
+      //   draggable: true,
+      //   progress: undefined,
+      //   theme: "light",
+      //   toastId: "Auth1",
+      //   //toast id dile toast ekbar ee show korbe***
+      // });
+    }
+    if (data?.data && !isLoading) {
       dispatch(setUser({
-        user: data?.data
+        user: data?.data,
       }));
     }
-  }, [data, userData, dispatch]);
+  }, [data, dispatch, isLoading, refetch, isSuccess]);
 
   return (
     <div className='app'>

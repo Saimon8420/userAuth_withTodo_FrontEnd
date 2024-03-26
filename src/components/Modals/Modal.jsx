@@ -4,18 +4,21 @@ import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { useDeleteTodoMutation } from '../Features/todo/todoApi';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
-import { deleteTodoCache } from '../Features/todo/todoSlice';
+import { setTodoRefetch } from '../Features/todo/todoSlice';
+import { userLoggedOut } from '../Features/auth/authSlice';
+import { useLazyLogoutUserQuery } from '../Features/auth/authApi';
 
-export default function Modal({ id, setOpenModal }) {
+export default function Modal({ DeletedTodoData }) {
+    const [_id, setOpenModal] = DeletedTodoData;
     const [open, setOpen] = useState(true);
     const cancelButtonRef = useRef(null);
 
-    const [deleteTodo, { data, isSuccess, isLoading }] = useDeleteTodoMutation();
-
     const dispatch = useDispatch();
+    const [logoutUser] = useLazyLogoutUserQuery();
+    const [deleteTodo, { data, isLoading }] = useDeleteTodoMutation();
+
     const handleDeleteTodo = () => {
-        deleteTodo({ id });
-        dispatch(deleteTodoCache({ todoId: id }));
+        deleteTodo({ id: _id });
     }
 
     useEffect(() => {
@@ -32,17 +35,31 @@ export default function Modal({ id, setOpenModal }) {
                 toastId: "deleteTodo1",
                 //toast id dile toast ekbar ee show korbe***
             });
-        }
-        if (isSuccess) {
+            dispatch(setTodoRefetch());
             setOpen(false)
         }
-    }, [isSuccess, data])
+        if (data !== undefined && data?.status === 401) {
+            toast.error(`${data?.msg}`, {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                toastId: "addTodo2",
+            });
+            dispatch(userLoggedOut());
+            logoutUser();
+        }
+
+    }, [data, dispatch, logoutUser])
 
     const handleCancel = () => {
         setOpenModal(false);
         setOpen(false);
     }
-
     return (
         <Transition.Root show={open} as={Fragment}>
             <Dialog as="div" className="relative z-10" initialFocus={cancelButtonRef} onClose={setOpen}>

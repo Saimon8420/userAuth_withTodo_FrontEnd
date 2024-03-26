@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import Header from '../Header/Header';
 import { useNavigate } from 'react-router-dom';
 import Loading from '../Loading/Loading';
+
 const Profile = () => {
     const userData = useSelector((state) => state.auth);
     const [user, setUser] = useState([]);
@@ -42,6 +43,7 @@ const Profile = () => {
             <div className="mb-14">
                 <Header />
             </div>
+
             <div className="mx-auto mt-0 grid max-w-2xl grid-cols-1 items-center gap-x-8 gap-y-16 px-4 py-10 sm:px-6 sm:py-32 lg:max-w-7xl lg:px-8 lg:py-10 md:py-10 text-center">
                 <div>
                     <div className='flex items-center justify-center gap-4'>

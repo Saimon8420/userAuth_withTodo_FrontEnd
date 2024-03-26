@@ -4,13 +4,10 @@ export const apiSlice = createApi({
     reducerPath: "api",
     baseQuery: fetchBaseQuery({
         baseUrl: "https://userauth-withtodo-backend.onrender.com/",
-        prepareHeaders: async (headers, { getState, endpoint }) => {
-            const token = JSON.parse(localStorage.getItem("userAuth"));
-            if (token) {
-                headers.set("authorization", `Bearer ${token?.accessToken}`)
-            }
+        prepareHeaders(headers) {
             return headers;
-        }
+        },
+        credentials: "include"
     }),
     tagTypes: ["Users", "Todos"],
     endpoints: (builder) => ({

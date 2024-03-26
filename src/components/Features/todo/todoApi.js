@@ -1,5 +1,4 @@
 import { apiSlice } from "../api/apiSlice";
-import { setTodo } from "./todoSlice";
 
 export const todoApi = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
@@ -14,26 +13,14 @@ export const todoApi = apiSlice.injectEndpoints({
 
         getTodo: builder.query({
             query: () => "todo/getTodo",
-            async onQueryStarted(args, { queryFulfilled, dispatch }) {
-                try {
-                    const result = await queryFulfilled;
-                    dispatch(setTodo({
-                        todo: result?.data?.data
-                    }))
-                } catch (error) {
-                    console.log(error);
-                }
-            },
-            invalidatesTags: ["Todos"],
         }),
 
         getEachTodo: builder.query({
             query: (todoId) => `todo/getEach/${todoId}`,
-            invalidatesTags: ["Todos"],
         }),
 
         updateTodo: builder.mutation({
-            query: (data) => (console.log(data), {
+            query: (data) => ({
                 url: `todo/updateTodo/${data?.id}`,
                 method: "PUT",
                 body: data?.updatedData,
@@ -51,4 +38,4 @@ export const todoApi = apiSlice.injectEndpoints({
     })
 })
 
-export const { useGetTodoQuery, useAddTodoMutation, useUpdateTodoMutation, useDeleteTodoMutation, useGetEachTodoQuery } = todoApi;
+export const { useLazyGetTodoQuery, useAddTodoMutation, useUpdateTodoMutation, useDeleteTodoMutation, useGetEachTodoQuery } = todoApi;

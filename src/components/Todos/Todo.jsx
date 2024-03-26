@@ -1,32 +1,40 @@
-import { useGetTodoQuery } from "../Features/todo/todoApi";
+import { useLazyGetTodoQuery } from "../Features/todo/todoApi";
 import Header from "../Header/Header";
 import TodoList from "./TodoList";
 import { useEffect, useState } from "react";
 import Loading from "../Loading/Loading";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setTodo } from "../Features/todo/todoSlice";
+// import { userLoggedOut } from "../Features/auth/authSlice";
 
 const Todo = () => {
-    const { isLoading, data, isSuccess, refetch } = useGetTodoQuery({
-        refetchOnMountOrArgChange: true,
-    });
+    const [getTodo, { isLoading, data }] = useLazyGetTodoQuery();
     const [allTodo, setAllTodo] = useState([]);
     const dispatch = useDispatch();
-    const todo = useSelector((state) => state.todo);
+
+    const todo = useSelector(state => state?.todo?.todoRefetch);
 
     useEffect(() => {
-        if (isSuccess) {
-            refetch();
-            dispatch(setTodo({ todo: data?.data }));
-            setAllTodo(todo?.allTodo);
+        getTodo()
+        if (!isLoading && data?.data) {
+            setAllTodo(data?.data);
         }
-    }, [isSuccess, data, todo, dispatch, refetch]);
+    }, [data, dispatch, isLoading, getTodo]);
+
+    // for todo list refetch
+    useEffect(() => {
+        if (todo) {
+            getTodo();
+        }
+    }, [todo, getTodo])
 
     const navigate = useNavigate();
 
     const [search, setSearch] = useState("");
     const [filterOpt, setFilterOpt] = useState("");
+
+    // console.log(isSuccess, isFetching);
+
     return (
         <div className="mt-20 grid gap-2">
             <div className="mb-5">
@@ -73,22 +81,26 @@ const Todo = () => {
                                         <summary>Filter Option</summary>
                                         <div className="flex items-center gap-1">
                                             <input type="checkbox" name="default" id=""
-                                                value={""}
-                                                onChange={(e) => setFilterOpt(e.target.value)} checked={filterOpt === "" ? true : false} />
+                                                onChange={() => setFilterOpt("")}
+                                                checked={filterOpt === "" ? true : false}
+                                                readOnly
+                                            />
                                             <label htmlFor="default">default</label>
                                         </div>
                                         <div className="flex items-center justify-center gap-5">
                                             <div className="flex items-center gap-1">
                                                 <input type="checkbox" name="completed" id="" placeholder="completed"
-                                                    value={'completed'}
-                                                    onClick={(e) => setFilterOpt(e.target.value)}
-                                                    checked={filterOpt === "completed" ? true : false} />
+                                                    onClick={() => setFilterOpt("completed")}
+                                                    checked={filterOpt === "completed" ? true : false}
+                                                    readOnly
+                                                />
                                                 <label htmlFor="completed">completed</label>
                                             </div>
                                             <div className="flex items-center gap-1">
                                                 <input type="checkbox" name="incomplete" id=""
-                                                    value={'incomplete'}
-                                                    onChange={(e) => setFilterOpt(e.target.value)} checked={filterOpt === "incomplete" ? true : false} />
+                                                    onChange={() => setFilterOpt("incomplete")} checked={filterOpt === "incomplete" ? true : false}
+                                                    readOnly
+                                                />
                                                 <label htmlFor="incomplete">incomplete</label>
                                             </div>
                                         </div>
@@ -103,7 +115,7 @@ const Todo = () => {
                                         ?.filter((each) => each?.title?.toLowerCase().includes(search) || each?.description?.toLowerCase().includes(search))
                                         ?.filter((each) => each?.status?.includes(filterOpt))
                                         ?.map((filteredTodo) => (
-                                            <TodoList key={filteredTodo?._id} todo={filteredTodo} />
+                                            <TodoList key={filteredTodo?._id} data={filteredTodo} />
                                         ))
                                 }
                             </div>
