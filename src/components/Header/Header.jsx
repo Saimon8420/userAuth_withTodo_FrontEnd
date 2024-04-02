@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Dialog } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { userLoggedOut } from '../Features/auth/authSlice';
 import { toast } from 'react-toastify';
@@ -17,11 +17,13 @@ export default function Header() {
     const [logOut, setLogout] = useState(false);
     const dispatch = useDispatch();
 
-    const [logoutUser, { isLoading, error }] = useLazyLogoutUserQuery();
+    const [logoutUser, { data }] = useLazyLogoutUserQuery();
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (logOut) {
             const handleLogOut = () => {
+                logoutUser();
                 toast('User successfully logged out', {
                     position: "top-right",
                     autoClose: 3000,
@@ -32,13 +34,18 @@ export default function Header() {
                     progress: undefined,
                     theme: "light",
                     toastId: "logout1",
-                });
-                dispatch(userLoggedOut());
-                logoutUser();
+                })
             }
             handleLogOut();
         }
     }, [logOut, dispatch, logoutUser])
+
+    useEffect(() => {
+        if (data?.status === 201) {
+            dispatch(userLoggedOut());
+            navigate("/");
+        }
+    }, [dispatch, navigate, data])
 
     return (
         <div className="bg-white">

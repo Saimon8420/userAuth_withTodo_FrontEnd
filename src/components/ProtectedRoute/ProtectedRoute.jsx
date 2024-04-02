@@ -1,14 +1,18 @@
-import { useSelector } from 'react-redux';
-import { Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import useAuth from '../hooks/useAuth';
 
 const ProtectedRoute = ({ children }) => {
-    const user = useSelector((state) => state?.auth);
-    if (user?.user === undefined) {
-        return <Navigate to="/home" replace />;
-    }
-    else {
-        return children;
-    }
+    const navigate = useNavigate();
+    const auth = useAuth();
+    useEffect(() => {
+        if (!auth) {
+            navigate('/', { replace: true });
+        }
+    }, [navigate, auth]);
+
+    return children;
+
 };
 
 export default ProtectedRoute;

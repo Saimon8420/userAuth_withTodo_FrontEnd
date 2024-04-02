@@ -3,14 +3,15 @@ import { useNavigate } from "react-router-dom";
 import Modal from "../Modals/Modal";
 
 const TodoList = ({ data }) => {
-    const { title, description, status, _id } = data;
+    const [filteredTodo, setIsRefetch] = data;
+    const { title, description, status, _id } = filteredTodo;
     const navigate = useNavigate();
     const [openModal, setOpenModal] = useState(false);
     return (
         <div className="h-full w-full">
             <div className="shadow shadow-slate-300 rounded h-full w-full">
                 {
-                    openModal && <Modal DeletedTodoData={[_id, setOpenModal]} />
+                    openModal && <Modal DeletedTodoData={[_id, setOpenModal, setIsRefetch]} />
                 }
                 <dl className="divide-y divide-gray-100">
                     <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">

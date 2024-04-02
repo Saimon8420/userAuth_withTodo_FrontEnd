@@ -40,6 +40,7 @@ const Login = () => {
                 toastId: "login1",
                 //toast id dile toast ekbar ee show korbe***
             });
+            // navigate("/");
         }
         if (data !== undefined && data?.status === 500 && data?.msg) {
             toast.error(`${data?.msg}`, {
@@ -54,6 +55,7 @@ const Login = () => {
                 toastId: "login1",
                 //toast id dile toast ekbar ee show korbe***
             });
+            // navigate("/home");
         }
     }, [data, navigate, dispatch, isLoading]);
 

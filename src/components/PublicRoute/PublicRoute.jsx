@@ -1,14 +1,18 @@
-import { useSelector } from 'react-redux';
-import { Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import useAuth from '../hooks/useAuth';
 
 const PublicRoute = ({ children }) => {
-    const user = useSelector((state) => state?.auth);
-    if (user?.user !== undefined) {
-        return <Navigate to="/" replace />;
-    }
-    else {
-        return children;
-    }
+    const navigate = useNavigate();
+    const auth = useAuth();
+    useEffect(() => {
+        if (auth) {
+            navigate('/profile', { replace: true });
+        }
+    }, [navigate, auth]);
+
+    return children;
 };
 
 export default PublicRoute;
+

@@ -6,13 +6,12 @@ import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { useLazyLogoutUserQuery } from '../Features/auth/authApi';
 import { userLoggedOut } from '../Features/auth/authSlice';
-import { setTodoRefetch } from '../Features/todo/todoSlice';
 
 const AddTodo = () => {
     const [title, setTitle] = useState([]);
     const [details, setDetails] = useState([]);
 
-    const [validation, setInputValidation] = useState(false);
+    const [validation, setValidation] = useState(false);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -22,17 +21,32 @@ const AddTodo = () => {
 
     useEffect(() => {
         if ((title?.length > 5 && title?.length < 50) && (details?.length > 10 && details?.length < 150)) {
-            setInputValidation(true);
+            setValidation(true);
         }
         else {
-            setInputValidation(false);
+            setValidation(false);
         }
     }, [title, details])
 
     const handleAddTodo = (e) => {
         e.preventDefault();
         if (title?.length > 0 && details?.length > 0) {
-            addTodo({ title: title, description: details })
+            if (validation) {
+                addTodo({ title: title, description: details })
+            }
+            else {
+                toast.error("invalid user input", {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    toastId: "addTodoError1",
+                });
+            }
         }
     }
 
@@ -51,7 +65,6 @@ const AddTodo = () => {
                 //toast id dile toast ekbar ee show korbe***
             });
             if (isSuccess) {
-                dispatch(setTodoRefetch());
                 return navigate("/todo");
             }
         }

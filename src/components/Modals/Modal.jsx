@@ -4,25 +4,27 @@ import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { useDeleteTodoMutation } from '../Features/todo/todoApi';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
-import { setTodoRefetch } from '../Features/todo/todoSlice';
 import { userLoggedOut } from '../Features/auth/authSlice';
 import { useLazyLogoutUserQuery } from '../Features/auth/authApi';
+import { useNavigate } from 'react-router-dom';
 
 export default function Modal({ DeletedTodoData }) {
-    const [_id, setOpenModal] = DeletedTodoData;
+    const [_id, setOpenModal, setIsRefetch] = DeletedTodoData;
     const [open, setOpen] = useState(true);
     const cancelButtonRef = useRef(null);
 
     const dispatch = useDispatch();
     const [logoutUser] = useLazyLogoutUserQuery();
-    const [deleteTodo, { data, isLoading }] = useDeleteTodoMutation();
+    const [deleteTodo, { data, isLoading, isSuccess }] = useDeleteTodoMutation();
+
+    const navigate = useNavigate();
 
     const handleDeleteTodo = () => {
         deleteTodo({ id: _id });
     }
 
     useEffect(() => {
-        if (data !== undefined && data?.status === 200) {
+        if (data !== undefined && data?.status === 200 && isSuccess) {
             toast(`${data.msg}`, {
                 position: "top-right",
                 autoClose: 3000,
@@ -35,8 +37,8 @@ export default function Modal({ DeletedTodoData }) {
                 toastId: "deleteTodo1",
                 //toast id dile toast ekbar ee show korbe***
             });
-            dispatch(setTodoRefetch());
-            setOpen(false)
+            setIsRefetch(true);
+            setOpen(false);
         }
         if (data !== undefined && data?.status === 401) {
             toast.error(`${data?.msg}`, {
@@ -54,7 +56,7 @@ export default function Modal({ DeletedTodoData }) {
             logoutUser();
         }
 
-    }, [data, dispatch, logoutUser])
+    }, [data, dispatch, logoutUser, isSuccess, navigate])
 
     const handleCancel = () => {
         setOpenModal(false);

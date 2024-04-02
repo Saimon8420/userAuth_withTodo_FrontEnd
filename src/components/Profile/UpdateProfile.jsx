@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useUpdateMutation } from '../Features/auth/authApi';
 import { Link, useNavigate } from 'react-router-dom';
-import { useRegisterMutation } from '../Features/auth/authApi';
 import { toast } from 'react-toastify';
+import { updateUser, userLoggedOut } from '../Features/auth/authSlice';
 
-const Registration = () => {
+const UpdateProfile = () => {
     const [firstName, setFirstName] = useState([]);
     const [lastName, setLastName] = useState([]);
     const [email, setEmail] = useState([]);
@@ -12,7 +13,8 @@ const Registration = () => {
     const [address, setAddress] = useState([]);
     const [password, setPassword] = useState([]);
     const [confirmPass, setConfirmPass] = useState([]);
-
+    // for unChanged password,
+    const [unChangePass, setUnChangePass] = useState([]);
     // Check Validation
     const [emailVal, setEmailVal] = useState(false);
     const [passVal, setPassVal] = useState(false);
@@ -37,25 +39,53 @@ const Registration = () => {
 
     }, [email, password, confirmPass, phone])
 
-    const [register, { data: registerData, isSuccess, isLoading: registerLoading }] = useRegisterMutation();
+    // updateUser
+    const data = useSelector((state) => state.auth);
+    const userData = data?.user;
+
+    //for updateInfo
+    useEffect(() => {
+        if (userData !== undefined) {
+            setFirstName(userData?.firstName);
+            setLastName(userData?.lastName);
+            setEmail(userData?.email);
+            setPhone(userData?.phone);
+            setAddress(userData?.address);
+            // setPassword(userData?.password);
+            setUnChangePass(userData?.password);
+        }
+    }, [userData])
+
+    const [update, { data: userUpdatedData, isLoading: updateLoading, isSuccess: updateSuccess }] = useUpdateMutation();
 
     const navigate = useNavigate();
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // For register user
-        if (password === confirmPass) {
-            if (firstName.length >= 4)
-                register({
+        // For update user
+        if (password?.length === 0) {
+            update({
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                address: address,
+                phone: phone,
+                unChangePass: unChangePass,
+            })
+        }
+        else {
+            if (password === confirmPass) {
+                update({
                     firstName: firstName,
                     lastName: lastName,
                     email: email,
                     address: address,
                     phone: phone,
-                    password: password,
+                    changedPass: password,
                 })
+            }
             else {
-                toast.error(`FirstName length must be 5 character or more`, {
+                toast.error("password does not matched", {
                     position: "top-right",
                     autoClose: 3000,
                     hideProgressBar: false,
@@ -64,32 +94,18 @@ const Registration = () => {
                     draggable: true,
                     progress: undefined,
                     theme: "light",
-                    toastId: "register2",
+                    toastId: "update20",
                 });
             }
-        }
-        else {
-            toast("password does not matched", {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light",
-                toastId: "register14",
-            });
         }
     }
 
     const dispatch = useDispatch();
 
-    // for toast
     useEffect(() => {
-        // user register & toast
-        if (registerData !== undefined && registerData?.status === 201) {
-            toast(`${registerData?.msg}`, {
+        // user update & toast
+        if (userUpdatedData !== undefined && userUpdatedData?.status === 200) {
+            toast(`${userUpdatedData?.msg}`, {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: false,
@@ -98,14 +114,18 @@ const Registration = () => {
                 draggable: true,
                 progress: undefined,
                 theme: "light",
-                toastId: "register1",
+                toastId: "update1",
             });
-            if (isSuccess) {
-                navigate("/login");
+
+            if (updateSuccess) {
+                dispatch(updateUser({
+                    user: userUpdatedData?.userData,
+                }))
+                navigate("/");
             }
         }
-        if (registerData !== undefined && registerData?.status === 500) {
-            toast.error(`${registerData?.msg}`, {
+        if (userUpdatedData?.status === 401) {
+            toast.error(`${userUpdatedData?.msg}`, {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: false,
@@ -114,11 +134,11 @@ const Registration = () => {
                 draggable: true,
                 progress: undefined,
                 theme: "light",
-                toastId: "register2",
+                toastId: "update2",
             });
-            navigate("/home");
+            dispatch(userLoggedOut());
         }
-    }, [registerData, navigate, isSuccess, dispatch])
+    }, [userUpdatedData, dispatch, navigate, updateSuccess])
 
     return (
         <div className='px-5 pt-2 pb-5 registerDiv rounded-md shadow-md'>
@@ -129,27 +149,29 @@ const Registration = () => {
                         src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
                         alt="Your Company"
                     />
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="rgb(79, 70, 229)" viewBox="0 0 24 24" className="w-auto h-10 cursor-pointer" onClick={() => navigate("/home")}>
-                        <title>Go back to home</title>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                    </svg>
                 </div>
-                <h2 className="mt-3 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-                    Register your account
-                </h2>
-            </div>
 
+                <h2 className="mt-3 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+                    Update User Info
+                </h2>
+
+            </div>
             <form onSubmit={handleSubmit}>
                 <div className="space-y-12">
                     <div className="border-b border-gray-900/10 pb-12">
                         <h2 className="font-bold leading-7 text-gray-900 text-lg">Personal Information</h2>
-                        <p className="mt-1 text-sm leading-6 text-gray-600">Fill-up all the (*) credentials for Sign Up.</p>
+                        <div className="mt-3 underline font-semibold text-indigo-600">
+                            <Link className='flex gap-1 items-center justify-center' to={"/"}>Back to <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            </svg>
+                            </Link>
+                        </div>
 
                         <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                             {/* Name */}
                             <div className="sm:col-span-3">
                                 <label htmlFor="first-name" className="block text-sm font-medium leading-6 text-gray-900 text-left">
-                                    First name *
+                                    First name
                                 </label>
                                 <div className="mt-2">
                                     <input
@@ -188,7 +210,7 @@ const Registration = () => {
                             {/* Email */}
                             <div className="sm:col-span-3">
                                 <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900 text-left">
-                                    Email address *
+                                    Email address
                                 </label>
                                 <div className="mt-2">
                                     <input
@@ -211,7 +233,7 @@ const Registration = () => {
                             {/* Number */}
                             <div className="sm:col-span-3">
                                 <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900 text-left">
-                                    Phone number *
+                                    Phone number
                                 </label>
                                 <div className="mt-2">
                                     <input
@@ -255,7 +277,7 @@ const Registration = () => {
                             {/* Password */}
                             <div className="sm:col-span-3">
                                 <label htmlFor="street-address" className="block text-sm font-medium leading-6 text-gray-900 text-left">
-                                    Password  *
+                                    Password
                                 </label>
                                 <div className="flex items-center gap-2 mt-2">
                                     <input
@@ -289,7 +311,7 @@ const Registration = () => {
                             {/* Confirm Password */}
                             <div className="sm:col-span-3">
                                 <label htmlFor="street-address" className="block text-sm font-medium leading-6 text-gray-900 text-left">
-                                    Confirm Password *
+                                    Confirm Password
                                 </label>
                                 <div className="flex items-center gap-2 mt-2">
                                     <input
@@ -318,26 +340,16 @@ const Registration = () => {
                         </div>
                     </div>
                     <button
-                        disabled={registerLoading}
+                        disabled={updateLoading}
                         type="submit"
                         className="flex w-1/4 justify-center items-center rounded-md mx-auto bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     >
-                        Sign Up
+                        Update Info
                     </button>
                 </div>
             </form>
-
-
-            <p className="mt-10 text-center text-sm text-gray-500">
-                Have an account?{' '}
-                <Link to={"/login"} className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-                    Please Sign-in
-                </Link>
-            </p>
         </div>
     );
 };
 
-export default Registration;
-
-
+export default UpdateProfile;

@@ -6,7 +6,6 @@ import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { userLoggedOut } from '../Features/auth/authSlice';
 import { useLazyLogoutUserQuery } from '../Features/auth/authApi';
-import { setTodoRefetch } from '../Features/todo/todoSlice';
 
 const UpdateTodo = () => {
     const [title, setTitle] = useState([]);
@@ -16,23 +15,25 @@ const UpdateTodo = () => {
     const todoId = useParams();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const [validation, setInputValidation] = useState(false);
+    const [validation, setValidation] = useState(false);
 
     useEffect(() => {
         if ((title?.length > 5 && title?.length < 50) && (details?.length > 10 && details?.length < 150)) {
-            setInputValidation(true);
+            setValidation(true);
         }
         else {
-            setInputValidation(false);
+            setValidation(false);
         }
     }, [title, details])
 
+    // get each todo Data
     const { data, isLoading, isSuccess: getSuccess, refetch } = useGetEachTodoQuery(todoId?.id, {
         refetchOnMountOrArgChange: true,
     });
 
     const [logoutUser] = useLazyLogoutUserQuery();
 
+    // set todo data into states
     useEffect(() => {
         if (getSuccess) {
             refetch();
@@ -62,13 +63,25 @@ const UpdateTodo = () => {
 
     const handleUpdateTodo = (e) => {
         e.preventDefault();
-        updateTodo({ id: data?.data?._id, updatedData: { title: title, description: details, status: selected } });
-        setTitle([]);
-        setDetails([]);
-        setStatus([]);
-        setSelected([]);
+        if (validation) {
+            updateTodo({ id: data?.data?._id, updatedData: { title: title, description: details, status: selected } });
+        }
+        else {
+            toast.error("invalid user input", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                toastId: "updateTodoError1",
+            });
+        }
     }
 
+    // after update todo
     useEffect(() => {
         if (updateData !== undefined && updateData?.status === 200) {
             toast(`${updateData.msg}`, {
@@ -83,7 +96,6 @@ const UpdateTodo = () => {
                 toastId: "updateTodo1",
                 //toast id dile toast ekbar ee show korbe***
             });
-            dispatch(setTodoRefetch());
             return navigate("/todo");
         }
         if (updateData?.status === 401 && updateData?.msg) {

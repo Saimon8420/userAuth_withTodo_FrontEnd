@@ -1,39 +1,30 @@
-import { useLazyGetTodoQuery } from "../Features/todo/todoApi";
+
 import Header from "../Header/Header";
 import TodoList from "./TodoList";
 import { useEffect, useState } from "react";
 import Loading from "../Loading/Loading";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-// import { userLoggedOut } from "../Features/auth/authSlice";
+import { useGetTodoQuery } from "../Features/todo/todoApi";
 
 const Todo = () => {
-    const [getTodo, { isLoading, data }] = useLazyGetTodoQuery();
     const [allTodo, setAllTodo] = useState([]);
-    const dispatch = useDispatch();
+    const { data, isLoading, refetch } = useGetTodoQuery();
+    const navigate = useNavigate();
 
-    const todo = useSelector(state => state?.todo?.todoRefetch);
+    const [isRefetch, setIsRefetch] = useState(false);
 
     useEffect(() => {
-        getTodo()
+        if (isRefetch) {
+            refetch();
+        }
         if (!isLoading && data?.data) {
             setAllTodo(data?.data);
         }
-    }, [data, dispatch, isLoading, getTodo]);
+    }, [data?.data, isLoading, refetch, isRefetch])
 
-    // for todo list refetch
-    useEffect(() => {
-        if (todo) {
-            getTodo();
-        }
-    }, [todo, getTodo])
-
-    const navigate = useNavigate();
 
     const [search, setSearch] = useState("");
     const [filterOpt, setFilterOpt] = useState("");
-
-    // console.log(isSuccess, isFetching);
 
     return (
         <div className="mt-20 grid gap-2">
@@ -115,7 +106,7 @@ const Todo = () => {
                                         ?.filter((each) => each?.title?.toLowerCase().includes(search) || each?.description?.toLowerCase().includes(search))
                                         ?.filter((each) => each?.status?.includes(filterOpt))
                                         ?.map((filteredTodo) => (
-                                            <TodoList key={filteredTodo?._id} data={filteredTodo} />
+                                            <TodoList key={filteredTodo?._id} data={[filteredTodo, setIsRefetch]} />
                                         ))
                                 }
                             </div>
